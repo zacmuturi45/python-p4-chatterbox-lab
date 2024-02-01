@@ -5,8 +5,9 @@ function EditMessage({ id, body, onUpdateMessage }) {
 
   function handleFormSubmit(e) {
     e.preventDefault();
+    console.log(messageBody)
 
-    fetch(`http://127.0.0.1:4000/messages/${id}`, {
+    fetch(`/messages/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -15,8 +16,19 @@ function EditMessage({ id, body, onUpdateMessage }) {
         body: messageBody,
       }),
     })
-      .then((r) => r.json())
-      .then((updatedMessage) => onUpdateMessage(updatedMessage));
+      .then((r) => {
+        if (!r.ok) {
+          throw new Error(`Failed to patch message: ${r.statusText}`);
+        }
+        return r.json();
+      })
+      .then((updatedMessage) => {
+        console.log(updatedMessage)
+        onUpdateMessage(updatedMessage)
+      })
+      .catch((error) => {
+        console.error('Error fetching message', error.message)
+      });
   }
 
   return (

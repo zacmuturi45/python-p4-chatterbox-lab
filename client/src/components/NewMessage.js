@@ -6,20 +6,29 @@ function NewMessage({ currentUser, onAddMessage }) {
   function handleSubmit(e) {
     e.preventDefault();
 
-    fetch("http://127.0.0.1:4000/messages", {
+    fetch("/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        username: currentUser.username,
         body: body,
+        username: currentUser.username,
       }),
     })
-      .then((r) => r.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to post message: ${response.statusText}`);
+        }
+        return response.json();
+      })
       .then((newMessage) => {
+        console.log(newMessage)
         onAddMessage(newMessage);
         setBody("");
+      })
+      .catch((error) => {
+        console.error('Error fetching message:', error.message);
       });
   }
 

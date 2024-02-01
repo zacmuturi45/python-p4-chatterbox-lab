@@ -12,10 +12,21 @@ function App() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    fetch("http://127.0.0.1:4000/messages")
-      .then((r) => r.json())
-      .then((messages) => setMessages(messages));
+    fetch("/messages")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Failed to fetch messages: ${response.statusText}`);
+      }
+      return response.json();
+    })
+    .then((messages) => {
+      setMessages(messages);
+    })
+    .catch((error) => {
+      console.error('Error fetching messages:', error.message);
+    });
   }, []);
+
 
   function handleAddMessage(newMessage) {
     setMessages([...messages, newMessage]);
@@ -39,7 +50,7 @@ function App() {
 
   const displayedMessages = messages.filter((message) =>
     message.body.toLowerCase().includes(search.toLowerCase())
-  );
+);
 
   return (
     <main className={isDarkMode ? "dark-mode" : ""}>
